@@ -1,0 +1,190 @@
+EESchema Schematic File Version 2
+LIBS:ECE
+LIBS:power
+LIBS:device
+LIBS:switches
+LIBS:relays
+LIBS:motors
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title "Alarm Clock PCB"
+Date ""
+Rev "1.0"
+Comp "Tanner and Ben"
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L LM386 U?
+U 1 1 5B2324A3
+P 2050 1900
+F 0 "U?" H 2100 2200 50  0000 L CNN
+F 1 "LM386" H 2100 2100 50  0000 L CNN
+F 2 "" H 2150 2000 50  0001 C CNN
+F 3 "" H 2250 2100 50  0001 C CNN
+	1    2050 1900
+	1    0    0    1   
+$EndComp
+$Comp
+L RES R?
+U 1 1 5B23262B
+P 850 1000
+F 0 "R?" H 850 1175 40  0000 C CNN
+F 1 "RES" H 850 1100 40  0000 C CNN
+F 2 "" H 850 1070 30  0000 C CNN
+F 3 "" V 850 1000 30  0000 C CNN
+	1    850  1000
+	1    0    0    -1  
+$EndComp
+$Comp
+L RES R?
+U 1 1 5B232694
+P 850 1250
+F 0 "R?" H 850 1425 40  0000 C CNN
+F 1 "RES" H 850 1350 40  0000 C CNN
+F 2 "" H 850 1320 30  0000 C CNN
+F 3 "" V 850 1250 30  0000 C CNN
+	1    850  1250
+	1    0    0    -1  
+$EndComp
+$Comp
+L RES R?
+U 1 1 5B2326F5
+P 850 1450
+F 0 "R?" H 850 1625 40  0000 C CNN
+F 1 "RES" H 850 1550 40  0000 C CNN
+F 2 "" H 850 1520 30  0000 C CNN
+F 3 "" V 850 1450 30  0000 C CNN
+	1    850  1450
+	1    0    0    -1  
+$EndComp
+$Comp
+L POT RV?
+U 1 1 5B2327B4
+P 1400 2000
+F 0 "RV?" V 1225 2000 50  0000 C CNN
+F 1 "POT" V 1300 2000 50  0000 C CNN
+F 2 "" H 1400 2000 50  0001 C CNN
+F 3 "" H 1400 2000 50  0001 C CNN
+	1    1400 2000
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C?
+U 1 1 5B23285D
+P 1250 750
+F 0 "C?" H 1250 975 40  0000 C CNN
+F 1 "CAP" H 1250 900 40  0000 C CNN
+F 2 "" H 1250 820 30  0000 C CNN
+F 3 "" V 1250 750 30  0000 C CNN
+	1    1250 750 
+	1    0    0    -1  
+$EndComp
+$Comp
+L CAP C?
+U 1 1 5B2328BE
+P 2100 950
+F 0 "C?" H 2100 1175 40  0000 C CNN
+F 1 "CAP" H 2100 1100 40  0000 C CNN
+F 2 "" H 2100 1020 30  0000 C CNN
+F 3 "" V 2100 950 30  0000 C CNN
+	1    2100 950 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1750 2000 1550 2000
+Wire Wire Line
+	1400 2150 1400 2350
+$Comp
+L GND #PWR?
+U 1 1 5B232F67
+P 1400 2350
+F 0 "#PWR?" H 1400 2100 50  0001 C CNN
+F 1 "GND" H 1400 2200 50  0000 C CNN
+F 2 "" H 1400 2350 50  0001 C CNN
+F 3 "" H 1400 2350 50  0001 C CNN
+	1    1400 2350
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1400 1900 1400 1850
+Wire Wire Line
+	1400 1850 850  1850
+Text GLabel 850  1850 0    60   Input ~ 0
+Vin
+Wire Wire Line
+	1800 1800 1750 1800
+Wire Wire Line
+	1750 1800 1750 1600
+Wire Wire Line
+	1750 1600 1350 1600
+$Comp
+L GND #PWR?
+U 1 1 5B232FDC
+P 1350 1600
+F 0 "#PWR?" H 1350 1350 50  0001 C CNN
+F 1 "GND" H 1350 1450 50  0000 C CNN
+F 2 "" H 1350 1600 50  0001 C CNN
+F 3 "" H 1350 1600 50  0001 C CNN
+	1    1350 1600
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1950 1600 1950 1350
+Wire Wire Line
+	1950 1350 1600 1350
+$Comp
+L GND #PWR?
+U 1 1 5B233010
+P 1600 1350
+F 0 "#PWR?" H 1600 1100 50  0001 C CNN
+F 1 "GND" H 1600 1200 50  0000 C CNN
+F 2 "" H 1600 1350 50  0001 C CNN
+F 3 "" H 1600 1350 50  0001 C CNN
+	1    1600 1350
+	1    0    0    -1  
+$EndComp
+$Comp
+L VCC #PWR?
+U 1 1 5B233032
+P 1950 2200
+F 0 "#PWR?" H 1950 2050 50  0001 C CNN
+F 1 "VCC" H 1950 2350 50  0000 C CNN
+F 2 "" H 1950 2200 50  0001 C CNN
+F 3 "" H 1950 2200 50  0001 C CNN
+	1    1950 2200
+	1    0    0    1   
+$EndComp
+$EndSCHEMATC
