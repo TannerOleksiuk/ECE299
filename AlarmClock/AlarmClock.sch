@@ -133,7 +133,7 @@ Wire Wire Line
 Wire Wire Line
 	1400 1850 850  1850
 Text GLabel 850  1850 0    60   Input ~ 0
-Vin
+PA4
 Wire Wire Line
 	1800 1800 1750 1800
 Wire Wire Line
@@ -218,10 +218,10 @@ F 3 "" V 3200 1900 30  0000 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Speaker LS?
+L Speaker LS1
 U 1 1 5B2332D9
 P 3900 2250
-F 0 "LS?" H 3950 2475 50  0000 R CNN
+F 0 "LS1" H 3950 2475 50  0000 R CNN
 F 1 "Speaker" H 3950 2400 50  0000 R CNN
 F 2 "" H 3900 2050 50  0001 C CNN
 F 3 "" H 3890 2200 50  0001 C CNN
@@ -241,4 +241,204 @@ F 3 "" H 3700 2700 50  0001 C CNN
 	1    3700 2700
 	1    0    0    -1  
 $EndComp
+$Comp
+L STM32_F4 STM?
+U 1 1 5B2807A9
+P 5900 3750
+F 0 "STM?" H 5900 3850 60  0000 C CNN
+F 1 "STM32_F4" H 5900 3650 60  0000 C CNN
+F 2 "" H 5900 3750 60  0000 C CNN
+F 3 "" H 5900 3750 60  0000 C CNN
+	1    5900 3750
+	1    0    0    -1  
+$EndComp
+Text GLabel 4650 5200 0    60   Input ~ 0
+PA4
+Wire Wire Line
+	4900 5200 4650 5200
+Wire Wire Line
+	4550 1800 4900 1800
+Text GLabel 4550 1800 0    60   Input ~ 0
+PC4
+Text GLabel 4550 1900 0    60   Input ~ 0
+PC5
+Wire Wire Line
+	4550 1900 4900 1900
+Text GLabel 4550 2200 0    60   Input ~ 0
+PC8
+Text GLabel 4550 2300 0    60   Input ~ 0
+PC9
+Text GLabel 4550 2500 0    60   Input ~ 0
+PC11
+Wire Wire Line
+	4550 2200 4900 2200
+Wire Wire Line
+	4550 2300 4900 2300
+Wire Wire Line
+	4550 2500 4900 2500
+Text GLabel 7250 1800 2    60   Input ~ 0
+PD4
+Text GLabel 7250 2100 2    60   Input ~ 0
+PD7
+Wire Wire Line
+	6900 5800 6900 6250
+Wire Wire Line
+	5200 6450 6350 6450
+Wire Wire Line
+	5200 6450 5200 6500
+$Comp
+L GND #PWR?
+U 1 1 5B28351C
+P 5200 6500
+F 0 "#PWR?" H 5200 6250 50  0001 C CNN
+F 1 "GND" H 5200 6350 50  0000 C CNN
+F 2 "" H 5200 6500 50  0001 C CNN
+F 3 "" H 5200 6500 50  0001 C CNN
+	1    5200 6500
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR?
+U 1 1 5B283542
+P 6900 6250
+F 0 "#PWR?" H 6900 6000 50  0001 C CNN
+F 1 "GND" H 6900 6100 50  0000 C CNN
+F 2 "" H 6900 6250 50  0001 C CNN
+F 3 "" H 6900 6250 50  0001 C CNN
+	1    6900 6250
+	1    0    0    -1  
+$EndComp
+Connection ~ 5450 6450
+Connection ~ 5550 6450
+Connection ~ 5650 6450
+Connection ~ 5750 6450
+Connection ~ 5850 6450
+Connection ~ 5950 6450
+Connection ~ 6050 6450
+Connection ~ 6150 6450
+Connection ~ 6250 6450
+Connection ~ 6900 6100
+Connection ~ 6900 6000
+Connection ~ 6900 5900
+Text GLabel 7250 2200 2    60   Input ~ 0
+PD8
+Text GLabel 7250 2300 2    60   Input ~ 0
+PD9
+Text GLabel 7250 2400 2    60   Input ~ 0
+PD10
+Text GLabel 7250 2500 2    60   Input ~ 0
+PD11
+Wire Wire Line
+	7250 1800 6900 1800
+Wire Wire Line
+	7250 2100 6900 2100
+Wire Wire Line
+	7250 2200 6900 2200
+Wire Wire Line
+	7250 2300 6900 2300
+Wire Wire Line
+	7250 2400 6900 2400
+Wire Wire Line
+	7250 2500 6900 2500
+Text GLabel 7300 3700 2    60   Input ~ 0
+PE6
+Text GLabel 7300 3800 2    60   Input ~ 0
+PE7
+Text GLabel 7300 3900 2    60   Input ~ 0
+PE8
+Text GLabel 7300 4000 2    60   Input ~ 0
+PE9
+Text GLabel 7300 4100 2    60   Input ~ 0
+PE10
+Text GLabel 7300 4200 2    60   Input ~ 0
+PE11
+Text GLabel 7300 4300 2    60   Input ~ 0
+PE12
+Text GLabel 7300 4400 2    60   Input ~ 0
+PE13
+Text GLabel 7300 4500 2    60   Input ~ 0
+PE14
+Text GLabel 7300 4600 2    60   Input ~ 0
+PE15
+Wire Wire Line
+	7300 3700 6900 3700
+Wire Wire Line
+	7300 3800 6900 3800
+Wire Wire Line
+	7300 3900 6900 3900
+Wire Wire Line
+	7300 4000 6900 4000
+Wire Wire Line
+	7300 4100 6900 4100
+Wire Wire Line
+	7300 4200 6900 4200
+Wire Wire Line
+	6900 4300 7300 4300
+Wire Wire Line
+	7300 4400 6900 4400
+Wire Wire Line
+	6900 4500 7300 4500
+Wire Wire Line
+	7300 4600 6900 4600
+NoConn ~ 4900 2600
+NoConn ~ 4900 2700
+NoConn ~ 4900 2800
+NoConn ~ 4900 2900
+NoConn ~ 4900 3100
+NoConn ~ 4900 3200
+NoConn ~ 4900 3300
+NoConn ~ 4900 3400
+NoConn ~ 4900 3500
+NoConn ~ 4900 3600
+NoConn ~ 4900 3700
+NoConn ~ 4900 3800
+NoConn ~ 4900 3900
+NoConn ~ 4900 4000
+NoConn ~ 4900 4100
+NoConn ~ 4900 4200
+NoConn ~ 4900 4300
+NoConn ~ 4900 4400
+NoConn ~ 4900 4500
+NoConn ~ 4900 4600
+NoConn ~ 4900 4800
+NoConn ~ 4900 4900
+NoConn ~ 4900 5000
+NoConn ~ 4900 5100
+NoConn ~ 4900 5300
+NoConn ~ 4900 5400
+NoConn ~ 4900 5500
+NoConn ~ 4900 5600
+NoConn ~ 4900 5700
+NoConn ~ 4900 5800
+NoConn ~ 4900 5900
+NoConn ~ 4900 6000
+NoConn ~ 4900 6100
+NoConn ~ 6900 5550
+NoConn ~ 6900 5350
+NoConn ~ 6900 5150
+NoConn ~ 6900 5050
+NoConn ~ 6900 4850
+NoConn ~ 6900 3600
+NoConn ~ 6900 3500
+NoConn ~ 6900 3400
+NoConn ~ 6900 3300
+NoConn ~ 6900 3200
+NoConn ~ 6900 3100
+NoConn ~ 6900 2900
+NoConn ~ 6900 2800
+NoConn ~ 6900 2700
+NoConn ~ 6900 2600
+NoConn ~ 4900 2400
+NoConn ~ 4900 2100
+NoConn ~ 4900 2000
+NoConn ~ 6900 2000
+NoConn ~ 6900 1900
+NoConn ~ 6900 1700
+NoConn ~ 6900 1600
+NoConn ~ 6900 1500
+NoConn ~ 6900 1400
+NoConn ~ 4900 1700
+NoConn ~ 4900 1600
+NoConn ~ 4900 1500
+NoConn ~ 4900 1400
 $EndSCHEMATC
