@@ -1,4 +1,4 @@
-update=6/14/2018 7:27:14 PM
+update=2018-06-18 7:11:58 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=
+LibDir=../../../../../Desktop/ECE.299 parts
 [eeschema/libraries]
 LibName1=ECE
 LibName2=power
@@ -62,3 +62,4 @@ LibName30=opto
 LibName31=atmel
 LibName32=contrib
 LibName33=valves
+LibName34=C:/Users/lucas/Desktop/ECE.299 parts/ECE
