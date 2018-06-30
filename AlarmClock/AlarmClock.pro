@@ -1,4 +1,4 @@
-update=6/29/2018 2:02:53 PM
+update=2018-06-30 9:29:35 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -29,8 +29,8 @@ version=1
 version=1
 LibDir=../../../Desktop
 [eeschema/libraries]
-LibName1=AlarmClock-rescue
-LibName2=ECE
+LibName1=ECE
+LibName2=AlarmClock-rescue
 LibName3=power
 LibName4=device
 LibName5=switches
