@@ -1,4 +1,4 @@
-update=2018-06-30 9:29:35 PM
+update=7/3/2018 2:11:54 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -23,8 +23,6 @@ ModuleOutlineThickness=0.150000000000
 [cvpcb]
 version=1
 NetIExt=net
-[general]
-version=1
 [eeschema]
 version=1
 LibDir=../../../Desktop
@@ -64,3 +62,5 @@ LibName32=atmel
 LibName33=contrib
 LibName34=valves
 LibName35=C:/Users/lucas/Desktop/ECE.299 parts/ECE
+[general]
+version=1
