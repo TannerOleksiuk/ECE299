@@ -1,0 +1,1118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export version="D">
+  <design>
+    <source>C:/Users/Tanner/Documents/GitHub/ECE299/AlarmClock/AlarmClock.sch</source>
+    <date>7/11/2018 6:34:40 PM</date>
+    <tool>Eeschema 4.0.7</tool>
+    <sheet number="1" name="/" tstamps="/">
+      <title_block>
+        <title>ECE 299 Alarm Clock PCB</title>
+        <company>Tanner Oleksiuk (V00867082) and Ben Lucas (V00892467)</company>
+        <rev>1.0</rev>
+        <date>2018-06-22</date>
+        <source>AlarmClock.sch</source>
+        <comment number="1" value=""/>
+        <comment number="2" value=""/>
+        <comment number="3" value=""/>
+        <comment number="4" value=""/>
+      </title_block>
+    </sheet>
+  </design>
+  <components>
+    <comp ref="U1">
+      <value>LM386</value>
+      <footprint>ECE:DIP8</footprint>
+      <libsource lib="linear" part="LM386"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2324A3</tstamp>
+    </comp>
+    <comp ref="R1">
+      <value>10Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B232694</tstamp>
+    </comp>
+    <comp ref="POT1">
+      <value>100kΩ</value>
+      <footprint>Potentiometers:Potentiometer_Alps_RK09K_Horizontal</footprint>
+      <libsource lib="device" part="POT"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2327B4</tstamp>
+    </comp>
+    <comp ref="C1">
+      <value>0.05uF</value>
+      <footprint>ECE:CAP.1</footprint>
+      <libsource lib="ECE" part="CAP"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B23285D</tstamp>
+    </comp>
+    <comp ref="C2">
+      <value>470uF</value>
+      <footprint>ECE:CAP_Pol_D6.3xH11.5xP2.0mm</footprint>
+      <libsource lib="ECE" part="CAP_POL"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2331BA</tstamp>
+    </comp>
+    <comp ref="LS1">
+      <value>Speaker</value>
+      <footprint>Wire_Connections_Bridges:WireConnection_1.00mmDrill</footprint>
+      <libsource lib="device" part="Speaker"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2332D9</tstamp>
+    </comp>
+    <comp ref="STM1">
+      <value>STM32_F407</value>
+      <footprint>ECE:STM32_F4</footprint>
+      <libsource lib="ECE" part="STM32_F4"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B2807A9</tstamp>
+    </comp>
+    <comp ref="C4">
+      <value>10uF</value>
+      <footprint>ECE:CAP_Pol_D6.3xH11.5xP2.0mm</footprint>
+      <libsource lib="ECE" part="CAP_POL"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B359A00</tstamp>
+    </comp>
+    <comp ref="U2">
+      <value>LTC-4727JR</value>
+      <footprint>ECE:LTC-4727JR</footprint>
+      <libsource lib="ECE" part="LTC-4727JR"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35AF0C</tstamp>
+    </comp>
+    <comp ref="R7">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35DF3F</tstamp>
+    </comp>
+    <comp ref="R8">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35DFC2</tstamp>
+    </comp>
+    <comp ref="R10">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E015</tstamp>
+    </comp>
+    <comp ref="R6">
+      <value>1kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E07C</tstamp>
+    </comp>
+    <comp ref="R5">
+      <value>1kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E0ED</tstamp>
+    </comp>
+    <comp ref="R9">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E138</tstamp>
+    </comp>
+    <comp ref="R4">
+      <value>1kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E189</tstamp>
+    </comp>
+    <comp ref="R14">
+      <value>1kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E1DE</tstamp>
+    </comp>
+    <comp ref="R12">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E23F</tstamp>
+    </comp>
+    <comp ref="R11">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E292</tstamp>
+    </comp>
+    <comp ref="R13">
+      <value>120Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E2E7</tstamp>
+    </comp>
+    <comp ref="R3">
+      <value>1kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E33E</tstamp>
+    </comp>
+    <comp ref="Q5">
+      <value>2N3904</value>
+      <footprint>ECE:TO92</footprint>
+      <libsource lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E654</tstamp>
+    </comp>
+    <comp ref="Q3">
+      <value>2N3904</value>
+      <footprint>ECE:TO92</footprint>
+      <libsource lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E6C1</tstamp>
+    </comp>
+    <comp ref="Q4">
+      <value>2N3904</value>
+      <footprint>ECE:TO92</footprint>
+      <libsource lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E74A</tstamp>
+    </comp>
+    <comp ref="Q2">
+      <value>2N3904</value>
+      <footprint>ECE:TO92</footprint>
+      <libsource lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E7D9</tstamp>
+    </comp>
+    <comp ref="Q1">
+      <value>2N3904</value>
+      <footprint>ECE:TO92</footprint>
+      <libsource lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B35E599</tstamp>
+    </comp>
+    <comp ref="U3">
+      <value>LM358</value>
+      <footprint>ECE:DIP8</footprint>
+      <libsource lib="linear" part="LM358"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36A61E</tstamp>
+    </comp>
+    <comp ref="R2">
+      <value>20kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36AA53</tstamp>
+    </comp>
+    <comp ref="R15">
+      <value>20kΩ</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36AAAC</tstamp>
+    </comp>
+    <comp ref="C5">
+      <value>1nF</value>
+      <footprint>ECE:CAP.1</footprint>
+      <libsource lib="ECE" part="CAP"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36AB01</tstamp>
+    </comp>
+    <comp ref="C3">
+      <value>1nF</value>
+      <footprint>ECE:CAP.1</footprint>
+      <libsource lib="ECE" part="CAP"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36AB56</tstamp>
+    </comp>
+    <comp ref="R16">
+      <value>200Ω</value>
+      <footprint>ECE:RES.3</footprint>
+      <libsource lib="ECE" part="RES"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B36FE4D</tstamp>
+    </comp>
+    <comp ref="D1">
+      <value>Diode</value>
+      <footprint>ECE:DO41</footprint>
+      <libsource lib="ECE" part="Diode"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C0B12</tstamp>
+    </comp>
+    <comp ref="D2">
+      <value>Diode</value>
+      <footprint>ECE:DO41</footprint>
+      <libsource lib="ECE" part="Diode"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C12E0</tstamp>
+    </comp>
+    <comp ref="SW1">
+      <value>SW_Push</value>
+      <footprint>Buttons_Switches_THT:SW_PUSH_6mm</footprint>
+      <libsource lib="switches" part="SW_Push"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C2F2D</tstamp>
+    </comp>
+    <comp ref="SW2">
+      <value>SW_Push</value>
+      <footprint>Buttons_Switches_THT:SW_PUSH_6mm</footprint>
+      <libsource lib="switches" part="SW_Push"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C2FB8</tstamp>
+    </comp>
+    <comp ref="SW3">
+      <value>SW_Push</value>
+      <footprint>Buttons_Switches_THT:SW_PUSH_6mm</footprint>
+      <libsource lib="switches" part="SW_Push"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C301B</tstamp>
+    </comp>
+    <comp ref="SW4">
+      <value>SW_Push</value>
+      <footprint>Buttons_Switches_THT:SW_PUSH_6mm</footprint>
+      <libsource lib="switches" part="SW_Push"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C30A4</tstamp>
+    </comp>
+    <comp ref="SW5">
+      <value>SW_Push</value>
+      <footprint>Buttons_Switches_THT:SW_PUSH_6mm</footprint>
+      <libsource lib="switches" part="SW_Push"/>
+      <sheetpath names="/" tstamps="/"/>
+      <tstamp>5B3C3113</tstamp>
+    </comp>
+  </components>
+  <libparts>
+    <libpart lib="AlarmClock-rescue" part="2N3904-RESCUE-AlarmClock">
+      <footprints>
+        <fp>TO92</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">Q</field>
+        <field name="Value">2N3904-RESCUE-AlarmClock</field>
+      </fields>
+      <pins>
+        <pin num="1" name="E" type="passive"/>
+        <pin num="2" name="B" type="input"/>
+        <pin num="3" name="C" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="CAP">
+      <footprints>
+        <fp>CAP.1</fp>
+        <fp>CAP.2</fp>
+        <fp>CAP.3</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CAP</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="CAP_POL">
+      <footprints>
+        <fp>CAP_Pol_D6.3xH11.5xP2.0mm</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">C</field>
+        <field name="Value">CAP_POL</field>
+      </fields>
+      <pins>
+        <pin num="1" name="+" type="passive"/>
+        <pin num="2" name="-" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="Diode">
+      <fields>
+        <field name="Reference">D</field>
+        <field name="Value">Diode</field>
+      </fields>
+      <pins>
+        <pin num="A" name="Anode" type="passive"/>
+        <pin num="K" name="Cathode" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="linear" part="LM2904">
+      <aliases>
+        <alias>LM358</alias>
+        <alias>AD8620</alias>
+        <alias>LMC6062</alias>
+        <alias>LMC6082</alias>
+        <alias>TL062</alias>
+        <alias>TL072</alias>
+        <alias>TL082</alias>
+        <alias>NE5532</alias>
+        <alias>SA5532</alias>
+        <alias>RC4558</alias>
+        <alias>RC4560</alias>
+        <alias>RC4580</alias>
+        <alias>LMV358</alias>
+        <alias>TS912</alias>
+        <alias>TSV912IDT</alias>
+        <alias>TSV912IST</alias>
+        <alias>TLC272</alias>
+        <alias>TLC277</alias>
+        <alias>MCP602</alias>
+        <alias>OPA2134</alias>
+        <alias>OPA2340</alias>
+        <alias>OPA2376xxD</alias>
+        <alias>OPA2376xxDGK</alias>
+        <alias>MC33078</alias>
+        <alias>MC33178</alias>
+        <alias>LM4562</alias>
+        <alias>OP249</alias>
+        <alias>OP275</alias>
+        <alias>ADA4075-2</alias>
+        <alias>MCP6002-xP</alias>
+        <alias>MCP6002-xSN</alias>
+        <alias>MCP6002-xMS</alias>
+        <alias>LM7332</alias>
+        <alias>OPA2333xxD</alias>
+        <alias>OPA2333xxDGK</alias>
+        <alias>LMC6482</alias>
+        <alias>LT1492</alias>
+        <alias>LTC6081xMS8</alias>
+        <alias>LM6172</alias>
+        <alias>MCP6L92</alias>
+        <alias>NJM2043</alias>
+        <alias>NJM2114</alias>
+        <alias>NJM4556A</alias>
+        <alias>NJM4558</alias>
+        <alias>NJM4559</alias>
+        <alias>NJM4560</alias>
+        <alias>NJM4580</alias>
+        <alias>NJM5532</alias>
+        <alias>ADA4807-2ARM</alias>
+        <alias>OPA2691</alias>
+      </aliases>
+      <description>Dual Operational Amplifiers, DIP-8/SOIC-8/TSSOP-8/VSSOP-8</description>
+      <docs>http://www.ti.com/lit/ds/symlink/lm358.pdf</docs>
+      <footprints>
+        <fp>SOIC*3.9x4.9mm*Pitch1.27mm*</fp>
+        <fp>DIP*W7.62mm*</fp>
+        <fp>TO*99*</fp>
+        <fp>OnSemi*Micro8*</fp>
+        <fp>TSSOP*3x3mm*Pitch0.65mm*</fp>
+        <fp>TSSOP*4.4x3mm*Pitch0.65mm*</fp>
+        <fp>MSOP*3x3mm*Pitch0.65mm*</fp>
+        <fp>SSOP*3.9x4.9mm*Pitch0.635mm*</fp>
+        <fp>LFCSP*2x2mm*Pitch0.5mm*</fp>
+        <fp>*SIP*</fp>
+        <fp>SOIC*5.3x6.2mm*Pitch1.27mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LM2904</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="output"/>
+        <pin num="2" name="-" type="input"/>
+        <pin num="3" name="+" type="input"/>
+        <pin num="4" name="V-" type="power_in"/>
+        <pin num="5" name="+" type="input"/>
+        <pin num="6" name="-" type="input"/>
+        <pin num="7" name="~" type="output"/>
+        <pin num="8" name="V+" type="power_in"/>
+      </pins>
+    </libpart>
+    <libpart lib="linear" part="LM386">
+      <description>Low Voltage Audio Power Amplifier, DIP-8/SOIC-8/SSOP-8</description>
+      <docs>http://www.ti.com/lit/ds/symlink/lm386.pdf</docs>
+      <footprints>
+        <fp>SOIC*3.9x4.9mm*Pitch1.27mm*</fp>
+        <fp>DIP*W7.62mm*</fp>
+        <fp>MSSOP*Pitch0.65mm*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LM386</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="input"/>
+        <pin num="2" name="-" type="input"/>
+        <pin num="3" name="+" type="input"/>
+        <pin num="4" name="Gnd" type="power_in"/>
+        <pin num="5" name="~" type="output"/>
+        <pin num="6" name="V+" type="power_in"/>
+        <pin num="7" name="~" type="input"/>
+        <pin num="8" name="~" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="LTC-4727JR">
+      <footprints>
+        <fp>LTC-4727JR</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">U</field>
+        <field name="Value">LTC-4727JR</field>
+      </fields>
+      <pins>
+        <pin num="1" name="D1" type="input"/>
+        <pin num="2" name="D2" type="input"/>
+        <pin num="3" name="D" type="input"/>
+        <pin num="4" name="L" type="input"/>
+        <pin num="5" name="E" type="input"/>
+        <pin num="6" name="D3" type="input"/>
+        <pin num="7" name="DP" type="input"/>
+        <pin num="8" name="D4" type="input"/>
+        <pin num="9" name="N/C" type="input"/>
+        <pin num="11" name="F" type="input"/>
+        <pin num="13" name="C,L3" type="input"/>
+        <pin num="14" name="A,L1" type="input"/>
+        <pin num="15" name="G" type="input"/>
+        <pin num="16" name="B,L2" type="input"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="POT">
+      <description>Potentiometer</description>
+      <footprints>
+        <fp>Potentiometer*</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">RV</field>
+        <field name="Value">POT</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+        <pin num="3" name="3" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="RES">
+      <footprints>
+        <fp>RES.1</fp>
+        <fp>RES.3</fp>
+        <fp>RES.4</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">R</field>
+        <field name="Value">RES</field>
+      </fields>
+      <pins>
+        <pin num="1" name="~" type="passive"/>
+        <pin num="2" name="~" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="ECE" part="STM32_F4">
+      <footprints>
+        <fp>STM32_F4</fp>
+      </footprints>
+      <fields>
+        <field name="Reference">STM</field>
+        <field name="Value">STM32_F4</field>
+      </fields>
+      <pins>
+        <pin num="1-1" name="GND" type="passive"/>
+        <pin num="1-2" name="GND" type="passive"/>
+        <pin num="1-3" name="VDD" type="passive"/>
+        <pin num="1-4" name="VDD" type="passive"/>
+        <pin num="1-5" name="GND" type="passive"/>
+        <pin num="1-6" name="NRST" type="passive"/>
+        <pin num="1-7" name="PC1" type="passive"/>
+        <pin num="1-8" name="PC0" type="passive"/>
+        <pin num="1-9" name="PC3" type="passive"/>
+        <pin num="1-10" name="PC2" type="passive"/>
+        <pin num="1-11" name="PA1" type="passive"/>
+        <pin num="1-12" name="PA0" type="passive"/>
+        <pin num="1-13" name="PA3" type="passive"/>
+        <pin num="1-14" name="PA2" type="passive"/>
+        <pin num="1-15" name="PA5" type="passive"/>
+        <pin num="1-16" name="PA4" type="passive"/>
+        <pin num="1-17" name="PA7" type="passive"/>
+        <pin num="1-18" name="PA6" type="passive"/>
+        <pin num="1-19" name="PC5" type="passive"/>
+        <pin num="1-20" name="PC4" type="passive"/>
+        <pin num="1-21" name="PB1" type="passive"/>
+        <pin num="1-22" name="PB0" type="passive"/>
+        <pin num="1-23" name="GND" type="passive"/>
+        <pin num="1-24" name="PB2" type="passive"/>
+        <pin num="1-25" name="PE7" type="passive"/>
+        <pin num="1-26" name="PE8" type="passive"/>
+        <pin num="1-27" name="PE9" type="passive"/>
+        <pin num="1-28" name="PE10" type="passive"/>
+        <pin num="1-29" name="PE11" type="passive"/>
+        <pin num="1-30" name="PE12" type="passive"/>
+        <pin num="1-31" name="PE13" type="passive"/>
+        <pin num="1-32" name="PE14" type="passive"/>
+        <pin num="1-33" name="PE15" type="passive"/>
+        <pin num="1-34" name="PB10" type="passive"/>
+        <pin num="1-35" name="PB11" type="passive"/>
+        <pin num="1-36" name="PB12" type="passive"/>
+        <pin num="1-37" name="PB13" type="passive"/>
+        <pin num="1-38" name="PB14" type="passive"/>
+        <pin num="1-39" name="PB15" type="passive"/>
+        <pin num="1-40" name="PD8" type="passive"/>
+        <pin num="1-41" name="PD9" type="passive"/>
+        <pin num="1-42" name="PD10" type="passive"/>
+        <pin num="1-43" name="PD11" type="passive"/>
+        <pin num="1-44" name="PD12" type="passive"/>
+        <pin num="1-45" name="PD13" type="passive"/>
+        <pin num="1-46" name="PD14" type="passive"/>
+        <pin num="1-47" name="PD15" type="passive"/>
+        <pin num="1-48" name="NC" type="input"/>
+        <pin num="1-49" name="GND" type="passive"/>
+        <pin num="1-50" name="GND" type="passive"/>
+        <pin num="2-1" name="GND" type="passive"/>
+        <pin num="2-2" name="GND" type="passive"/>
+        <pin num="2-3" name="5V" type="passive"/>
+        <pin num="2-4" name="5V" type="passive"/>
+        <pin num="2-5" name="3V" type="passive"/>
+        <pin num="2-6" name="3V" type="passive"/>
+        <pin num="2-7" name="PH0" type="passive"/>
+        <pin num="2-8" name="PH1" type="passive"/>
+        <pin num="2-9" name="PC14" type="passive"/>
+        <pin num="2-10" name="PC15" type="passive"/>
+        <pin num="2-11" name="PE6" type="passive"/>
+        <pin num="2-12" name="PC13" type="passive"/>
+        <pin num="2-13" name="PE4" type="passive"/>
+        <pin num="2-14" name="PE5" type="passive"/>
+        <pin num="2-15" name="PE2" type="passive"/>
+        <pin num="2-16" name="PE3" type="passive"/>
+        <pin num="2-17" name="PE0" type="passive"/>
+        <pin num="2-18" name="PE1" type="passive"/>
+        <pin num="2-19" name="PB8" type="passive"/>
+        <pin num="2-20" name="PB9" type="passive"/>
+        <pin num="2-21" name="BOOT" type="passive"/>
+        <pin num="2-22" name="VDD" type="passive"/>
+        <pin num="2-23" name="PB6" type="passive"/>
+        <pin num="2-24" name="PB7" type="passive"/>
+        <pin num="2-25" name="PB4" type="passive"/>
+        <pin num="2-26" name="PB5" type="passive"/>
+        <pin num="2-27" name="PD7" type="passive"/>
+        <pin num="2-28" name="PB3" type="passive"/>
+        <pin num="2-29" name="PD5" type="passive"/>
+        <pin num="2-30" name="PD6" type="passive"/>
+        <pin num="2-31" name="PD3" type="passive"/>
+        <pin num="2-32" name="PD4" type="passive"/>
+        <pin num="2-33" name="PD1" type="passive"/>
+        <pin num="2-34" name="PD2" type="passive"/>
+        <pin num="2-35" name="PC12" type="passive"/>
+        <pin num="2-36" name="PD0" type="passive"/>
+        <pin num="2-37" name="PC10" type="passive"/>
+        <pin num="2-38" name="PC11" type="passive"/>
+        <pin num="2-39" name="PA14" type="passive"/>
+        <pin num="2-40" name="PA15" type="passive"/>
+        <pin num="2-41" name="PA10" type="passive"/>
+        <pin num="2-42" name="PA13" type="passive"/>
+        <pin num="2-43" name="PA8" type="passive"/>
+        <pin num="2-44" name="PA9" type="passive"/>
+        <pin num="2-45" name="PC8" type="passive"/>
+        <pin num="2-46" name="PC9" type="passive"/>
+        <pin num="2-47" name="PC6" type="passive"/>
+        <pin num="2-48" name="PC7" type="passive"/>
+        <pin num="2-49" name="GND" type="passive"/>
+        <pin num="2-50" name="GND" type="passive"/>
+        <pin num="JP21" name="GND" type="passive"/>
+        <pin num="JP22" name="GND" type="passive"/>
+        <pin num="JP31" name="GND" type="passive"/>
+        <pin num="JP32" name="GND" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="switches" part="SW_Push">
+      <description>Push button switch, generic, two pins</description>
+      <fields>
+        <field name="Reference">SW</field>
+        <field name="Value">SW_Push</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="passive"/>
+        <pin num="2" name="2" type="passive"/>
+      </pins>
+    </libpart>
+    <libpart lib="device" part="Speaker">
+      <description>speaker </description>
+      <fields>
+        <field name="Reference">LS</field>
+        <field name="Value">Speaker</field>
+      </fields>
+      <pins>
+        <pin num="1" name="1" type="input"/>
+        <pin num="2" name="2" type="input"/>
+      </pins>
+    </libpart>
+  </libparts>
+  <libraries>
+    <library logical="ECE">
+      <uri>C:\Program Files\KiCad\share\kicad\library\ECE.lib</uri>
+    </library>
+    <library logical="AlarmClock-rescue">
+      <uri>C:\Users\Tanner\Documents\GitHub\ECE299\AlarmClock\AlarmClock-rescue.lib</uri>
+    </library>
+    <library logical="device">
+      <uri>C:\Program Files\KiCad\share\kicad\library\device.lib</uri>
+    </library>
+    <library logical="switches">
+      <uri>C:\Program Files\KiCad\share\kicad\library\switches.lib</uri>
+    </library>
+    <library logical="linear">
+      <uri>C:\Program Files\KiCad\share\kicad\library\linear.lib</uri>
+    </library>
+  </libraries>
+  <nets>
+    <net code="1" name="+3V3">
+      <node ref="D2" pin="A"/>
+      <node ref="U3" pin="8"/>
+      <node ref="STM1" pin="2-6"/>
+      <node ref="STM1" pin="2-5"/>
+    </net>
+    <net code="2" name="Net-(POT1-Pad2)">
+      <node ref="POT1" pin="2"/>
+      <node ref="U1" pin="3"/>
+    </net>
+    <net code="3" name="Net-(C1-Pad1)">
+      <node ref="R16" pin="2"/>
+      <node ref="C2" pin="1"/>
+      <node ref="C1" pin="1"/>
+    </net>
+    <net code="4" name="Net-(R16-Pad1)">
+      <node ref="R16" pin="1"/>
+      <node ref="U1" pin="5"/>
+    </net>
+    <net code="5" name="Net-(U1-Pad8)">
+      <node ref="U1" pin="8"/>
+    </net>
+    <net code="6" name="Net-(U1-Pad1)">
+      <node ref="U1" pin="1"/>
+    </net>
+    <net code="7" name="PE6">
+      <node ref="STM1" pin="2-11"/>
+    </net>
+    <net code="8" name="PD11">
+      <node ref="STM1" pin="1-43"/>
+    </net>
+    <net code="9" name="Net-(D1-PadK)">
+      <node ref="D1" pin="K"/>
+      <node ref="LS1" pin="1"/>
+    </net>
+    <net code="10" name="Net-(Q1-Pad2)">
+      <node ref="R3" pin="1"/>
+      <node ref="Q1" pin="2"/>
+    </net>
+    <net code="11" name="Net-(R12-Pad2)">
+      <node ref="R12" pin="2"/>
+      <node ref="U2" pin="11"/>
+    </net>
+    <net code="12" name="Net-(Q5-Pad2)">
+      <node ref="R14" pin="1"/>
+      <node ref="Q5" pin="2"/>
+    </net>
+    <net code="13" name="Net-(Q2-Pad2)">
+      <node ref="R4" pin="1"/>
+      <node ref="Q2" pin="2"/>
+    </net>
+    <net code="14" name="Net-(Q3-Pad2)">
+      <node ref="Q3" pin="2"/>
+      <node ref="R5" pin="1"/>
+    </net>
+    <net code="15" name="Net-(Q4-Pad2)">
+      <node ref="Q4" pin="2"/>
+      <node ref="R6" pin="1"/>
+    </net>
+    <net code="16" name="Net-(C5-Pad2)">
+      <node ref="R15" pin="2"/>
+      <node ref="C5" pin="2"/>
+      <node ref="R2" pin="1"/>
+    </net>
+    <net code="17" name="PA4">
+      <node ref="R2" pin="2"/>
+      <node ref="STM1" pin="1-16"/>
+    </net>
+    <net code="18" name="GND">
+      <node ref="U1" pin="4"/>
+      <node ref="R1" pin="1"/>
+      <node ref="STM1" pin="2-1"/>
+      <node ref="POT1" pin="3"/>
+      <node ref="STM1" pin="JP32"/>
+      <node ref="STM1" pin="1-23"/>
+      <node ref="STM1" pin="JP22"/>
+      <node ref="STM1" pin="JP31"/>
+      <node ref="STM1" pin="JP21"/>
+      <node ref="STM1" pin="1-1"/>
+      <node ref="LS1" pin="2"/>
+      <node ref="Q1" pin="1"/>
+      <node ref="Q3" pin="1"/>
+      <node ref="Q4" pin="1"/>
+      <node ref="Q2" pin="1"/>
+      <node ref="C3" pin="2"/>
+      <node ref="STM1" pin="1-49"/>
+      <node ref="U3" pin="4"/>
+      <node ref="U1" pin="2"/>
+      <node ref="STM1" pin="2-50"/>
+      <node ref="STM1" pin="1-50"/>
+      <node ref="Q5" pin="1"/>
+      <node ref="STM1" pin="2-49"/>
+      <node ref="STM1" pin="1-5"/>
+      <node ref="STM1" pin="2-2"/>
+      <node ref="C4" pin="2"/>
+      <node ref="STM1" pin="1-2"/>
+    </net>
+    <net code="19" name="PD9">
+      <node ref="R3" pin="2"/>
+      <node ref="STM1" pin="1-41"/>
+    </net>
+    <net code="20" name="PD10">
+      <node ref="STM1" pin="1-42"/>
+      <node ref="R4" pin="2"/>
+    </net>
+    <net code="21" name="PD8">
+      <node ref="STM1" pin="1-40"/>
+      <node ref="R5" pin="2"/>
+    </net>
+    <net code="22" name="PD7">
+      <node ref="R6" pin="2"/>
+      <node ref="STM1" pin="2-27"/>
+    </net>
+    <net code="23" name="PD4">
+      <node ref="R14" pin="2"/>
+      <node ref="STM1" pin="2-32"/>
+    </net>
+    <net code="24" name="Net-(U2-Pad7)">
+      <node ref="U2" pin="7"/>
+    </net>
+    <net code="25" name="Net-(U2-Pad9)">
+      <node ref="U2" pin="9"/>
+    </net>
+    <net code="26" name="PE13">
+      <node ref="STM1" pin="1-31"/>
+      <node ref="R13" pin="1"/>
+    </net>
+    <net code="27" name="PE12">
+      <node ref="STM1" pin="1-30"/>
+      <node ref="R12" pin="1"/>
+    </net>
+    <net code="28" name="PE11">
+      <node ref="R11" pin="1"/>
+      <node ref="STM1" pin="1-29"/>
+    </net>
+    <net code="29" name="PE10">
+      <node ref="STM1" pin="1-28"/>
+      <node ref="R10" pin="1"/>
+    </net>
+    <net code="30" name="PE9">
+      <node ref="R9" pin="1"/>
+      <node ref="STM1" pin="1-27"/>
+    </net>
+    <net code="31" name="PE8">
+      <node ref="R8" pin="1"/>
+      <node ref="STM1" pin="1-26"/>
+    </net>
+    <net code="32" name="PE7">
+      <node ref="STM1" pin="1-25"/>
+      <node ref="R7" pin="1"/>
+    </net>
+    <net code="33" name="Net-(D2-PadK)">
+      <node ref="D2" pin="K"/>
+      <node ref="SW1" pin="2"/>
+      <node ref="SW2" pin="2"/>
+      <node ref="SW3" pin="2"/>
+      <node ref="SW4" pin="2"/>
+      <node ref="SW5" pin="2"/>
+    </net>
+    <net code="34" name="Net-(C3-Pad1)">
+      <node ref="R15" pin="1"/>
+      <node ref="C3" pin="1"/>
+      <node ref="U3" pin="3"/>
+    </net>
+    <net code="35" name="Vf">
+      <node ref="C5" pin="1"/>
+      <node ref="U3" pin="2"/>
+      <node ref="U3" pin="1"/>
+      <node ref="POT1" pin="1"/>
+    </net>
+    <net code="36" name="Net-(Q1-Pad3)">
+      <node ref="U2" pin="8"/>
+      <node ref="Q1" pin="3"/>
+    </net>
+    <net code="37" name="PC11">
+      <node ref="STM1" pin="2-38"/>
+      <node ref="SW5" pin="1"/>
+    </net>
+    <net code="38" name="PC9">
+      <node ref="SW4" pin="1"/>
+      <node ref="STM1" pin="2-46"/>
+    </net>
+    <net code="39" name="PC8">
+      <node ref="STM1" pin="2-45"/>
+      <node ref="SW3" pin="1"/>
+    </net>
+    <net code="40" name="PC5">
+      <node ref="STM1" pin="1-19"/>
+      <node ref="SW2" pin="1"/>
+    </net>
+    <net code="41" name="PC4">
+      <node ref="STM1" pin="1-20"/>
+      <node ref="SW1" pin="1"/>
+    </net>
+    <net code="42" name="Net-(C2-Pad2)">
+      <node ref="C2" pin="2"/>
+      <node ref="D1" pin="A"/>
+    </net>
+    <net code="43" name="Net-(R11-Pad2)">
+      <node ref="R11" pin="2"/>
+      <node ref="U2" pin="5"/>
+    </net>
+    <net code="44" name="Net-(R10-Pad2)">
+      <node ref="U2" pin="3"/>
+      <node ref="R10" pin="2"/>
+    </net>
+    <net code="45" name="Net-(R9-Pad2)">
+      <node ref="R9" pin="2"/>
+      <node ref="U2" pin="13"/>
+    </net>
+    <net code="46" name="Net-(R8-Pad2)">
+      <node ref="R8" pin="2"/>
+      <node ref="U2" pin="16"/>
+    </net>
+    <net code="47" name="Net-(R7-Pad2)">
+      <node ref="U2" pin="14"/>
+      <node ref="R7" pin="2"/>
+    </net>
+    <net code="48" name="+5V">
+      <node ref="STM1" pin="2-4"/>
+      <node ref="C4" pin="1"/>
+      <node ref="U1" pin="6"/>
+    </net>
+    <net code="49" name="PE15">
+      <node ref="STM1" pin="1-33"/>
+    </net>
+    <net code="50" name="PE14">
+      <node ref="STM1" pin="1-32"/>
+    </net>
+    <net code="51" name="Net-(Q2-Pad3)">
+      <node ref="U2" pin="6"/>
+      <node ref="Q2" pin="3"/>
+    </net>
+    <net code="52" name="Net-(Q3-Pad3)">
+      <node ref="U2" pin="4"/>
+      <node ref="Q3" pin="3"/>
+    </net>
+    <net code="53" name="Net-(Q4-Pad3)">
+      <node ref="Q4" pin="3"/>
+      <node ref="U2" pin="2"/>
+    </net>
+    <net code="54" name="Net-(Q5-Pad3)">
+      <node ref="Q5" pin="3"/>
+      <node ref="U2" pin="1"/>
+    </net>
+    <net code="55" name="Net-(R13-Pad2)">
+      <node ref="U2" pin="15"/>
+      <node ref="R13" pin="2"/>
+    </net>
+    <net code="56" name="Net-(STM1-Pad1-13)">
+      <node ref="STM1" pin="1-13"/>
+    </net>
+    <net code="57" name="Net-(STM1-Pad2-44)">
+      <node ref="STM1" pin="2-44"/>
+    </net>
+    <net code="58" name="Net-(STM1-Pad1-44)">
+      <node ref="STM1" pin="1-44"/>
+    </net>
+    <net code="59" name="Net-(STM1-Pad2-34)">
+      <node ref="STM1" pin="2-34"/>
+    </net>
+    <net code="60" name="Net-(STM1-Pad1-34)">
+      <node ref="STM1" pin="1-34"/>
+    </net>
+    <net code="61" name="Net-(STM1-Pad2-24)">
+      <node ref="STM1" pin="2-24"/>
+    </net>
+    <net code="62" name="Net-(STM1-Pad1-24)">
+      <node ref="STM1" pin="1-24"/>
+    </net>
+    <net code="63" name="Net-(STM1-Pad2-14)">
+      <node ref="STM1" pin="2-14"/>
+    </net>
+    <net code="64" name="Net-(STM1-Pad1-14)">
+      <node ref="STM1" pin="1-14"/>
+    </net>
+    <net code="65" name="Net-(STM1-Pad2-43)">
+      <node ref="STM1" pin="2-43"/>
+    </net>
+    <net code="66" name="Net-(STM1-Pad2-33)">
+      <node ref="STM1" pin="2-33"/>
+    </net>
+    <net code="67" name="Net-(STM1-Pad2-23)">
+      <node ref="STM1" pin="2-23"/>
+    </net>
+    <net code="68" name="Net-(STM1-Pad2-13)">
+      <node ref="STM1" pin="2-13"/>
+    </net>
+    <net code="69" name="Net-(STM1-Pad1-15)">
+      <node ref="STM1" pin="1-15"/>
+    </net>
+    <net code="70" name="Net-(STM1-Pad2-42)">
+      <node ref="STM1" pin="2-42"/>
+    </net>
+    <net code="71" name="Net-(STM1-Pad2-22)">
+      <node ref="STM1" pin="2-22"/>
+    </net>
+    <net code="72" name="Net-(STM1-Pad1-22)">
+      <node ref="STM1" pin="1-22"/>
+    </net>
+    <net code="73" name="Net-(STM1-Pad2-12)">
+      <node ref="STM1" pin="2-12"/>
+    </net>
+    <net code="74" name="Net-(STM1-Pad1-12)">
+      <node ref="STM1" pin="1-12"/>
+    </net>
+    <net code="75" name="Net-(STM1-Pad2-41)">
+      <node ref="STM1" pin="2-41"/>
+    </net>
+    <net code="76" name="Net-(STM1-Pad2-31)">
+      <node ref="STM1" pin="2-31"/>
+    </net>
+    <net code="77" name="Net-(STM1-Pad1-48)">
+      <node ref="STM1" pin="1-48"/>
+    </net>
+    <net code="78" name="Net-(STM1-Pad1-38)">
+      <node ref="STM1" pin="1-38"/>
+    </net>
+    <net code="79" name="Net-(STM1-Pad2-28)">
+      <node ref="STM1" pin="2-28"/>
+    </net>
+    <net code="80" name="Net-(STM1-Pad2-18)">
+      <node ref="STM1" pin="2-18"/>
+    </net>
+    <net code="81" name="Net-(STM1-Pad1-18)">
+      <node ref="STM1" pin="1-18"/>
+    </net>
+    <net code="82" name="Net-(STM1-Pad2-47)">
+      <node ref="STM1" pin="2-47"/>
+    </net>
+    <net code="83" name="Net-(STM1-Pad1-47)">
+      <node ref="STM1" pin="1-47"/>
+    </net>
+    <net code="84" name="Net-(STM1-Pad2-37)">
+      <node ref="STM1" pin="2-37"/>
+    </net>
+    <net code="85" name="Net-(STM1-Pad1-37)">
+      <node ref="STM1" pin="1-37"/>
+    </net>
+    <net code="86" name="Net-(STM1-Pad2-17)">
+      <node ref="STM1" pin="2-17"/>
+    </net>
+    <net code="87" name="Net-(STM1-Pad1-17)">
+      <node ref="STM1" pin="1-17"/>
+    </net>
+    <net code="88" name="Net-(STM1-Pad1-46)">
+      <node ref="STM1" pin="1-46"/>
+    </net>
+    <net code="89" name="Net-(STM1-Pad2-36)">
+      <node ref="STM1" pin="2-36"/>
+    </net>
+    <net code="90" name="Net-(STM1-Pad1-36)">
+      <node ref="STM1" pin="1-36"/>
+    </net>
+    <net code="91" name="Net-(STM1-Pad2-26)">
+      <node ref="STM1" pin="2-26"/>
+    </net>
+    <net code="92" name="Net-(STM1-Pad2-16)">
+      <node ref="STM1" pin="2-16"/>
+    </net>
+    <net code="93" name="Net-(STM1-Pad1-45)">
+      <node ref="STM1" pin="1-45"/>
+    </net>
+    <net code="94" name="Net-(STM1-Pad2-35)">
+      <node ref="STM1" pin="2-35"/>
+    </net>
+    <net code="95" name="Net-(STM1-Pad1-35)">
+      <node ref="STM1" pin="1-35"/>
+    </net>
+    <net code="96" name="Net-(STM1-Pad2-25)">
+      <node ref="STM1" pin="2-25"/>
+    </net>
+    <net code="97" name="Net-(STM1-Pad2-15)">
+      <node ref="STM1" pin="2-15"/>
+    </net>
+    <net code="98" name="Net-(U1-Pad7)">
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="99" name="Net-(C1-Pad2)">
+      <node ref="R1" pin="2"/>
+      <node ref="C1" pin="2"/>
+    </net>
+    <net code="100" name="Net-(STM1-Pad1-9)">
+      <node ref="STM1" pin="1-9"/>
+    </net>
+    <net code="101" name="Net-(STM1-Pad2-21)">
+      <node ref="STM1" pin="2-21"/>
+    </net>
+    <net code="102" name="Net-(STM1-Pad1-21)">
+      <node ref="STM1" pin="1-21"/>
+    </net>
+    <net code="103" name="Net-(STM1-Pad1-11)">
+      <node ref="STM1" pin="1-11"/>
+    </net>
+    <net code="104" name="Net-(STM1-Pad2-40)">
+      <node ref="STM1" pin="2-40"/>
+    </net>
+    <net code="105" name="Net-(STM1-Pad2-30)">
+      <node ref="STM1" pin="2-30"/>
+    </net>
+    <net code="106" name="Net-(STM1-Pad2-20)">
+      <node ref="STM1" pin="2-20"/>
+    </net>
+    <net code="107" name="Net-(STM1-Pad2-10)">
+      <node ref="STM1" pin="2-10"/>
+    </net>
+    <net code="108" name="Net-(STM1-Pad1-10)">
+      <node ref="STM1" pin="1-10"/>
+    </net>
+    <net code="109" name="Net-(STM1-Pad2-9)">
+      <node ref="STM1" pin="2-9"/>
+    </net>
+    <net code="110" name="Net-(STM1-Pad2-48)">
+      <node ref="STM1" pin="2-48"/>
+    </net>
+    <net code="111" name="Net-(STM1-Pad2-8)">
+      <node ref="STM1" pin="2-8"/>
+    </net>
+    <net code="112" name="Net-(STM1-Pad1-8)">
+      <node ref="STM1" pin="1-8"/>
+    </net>
+    <net code="113" name="Net-(STM1-Pad2-7)">
+      <node ref="STM1" pin="2-7"/>
+    </net>
+    <net code="114" name="Net-(STM1-Pad1-7)">
+      <node ref="STM1" pin="1-7"/>
+    </net>
+    <net code="115" name="Net-(STM1-Pad1-6)">
+      <node ref="STM1" pin="1-6"/>
+    </net>
+    <net code="116" name="Net-(STM1-Pad1-4)">
+      <node ref="STM1" pin="1-4"/>
+    </net>
+    <net code="117" name="Net-(STM1-Pad2-3)">
+      <node ref="STM1" pin="2-3"/>
+    </net>
+    <net code="118" name="Net-(STM1-Pad1-3)">
+      <node ref="STM1" pin="1-3"/>
+    </net>
+    <net code="119" name="Net-(STM1-Pad2-29)">
+      <node ref="STM1" pin="2-29"/>
+    </net>
+    <net code="120" name="Net-(STM1-Pad2-39)">
+      <node ref="STM1" pin="2-39"/>
+    </net>
+    <net code="121" name="Net-(STM1-Pad1-39)">
+      <node ref="STM1" pin="1-39"/>
+    </net>
+    <net code="122" name="Net-(STM1-Pad2-19)">
+      <node ref="STM1" pin="2-19"/>
+    </net>
+  </nets>
+</export>
