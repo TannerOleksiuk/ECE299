@@ -1,0 +1,1214 @@
+//
+// This file is part of the GNU ARM Eclipse distribution.
+// Copyright (c) 2014 Liviu Ionescu.
+//
+
+// ----------------------------------------------------------------------------
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "diag/Trace.h"
+#include "fatfs.h"
+#include "usb_host.h"
+#include "stm32f4xx_hal.h"
+#include "Timer.h"
+#include "BlinkLed.h"
+#include "PlayMP3.h"
+#include "cortexm/ExceptionHandlers.h"
+#include "generic.h"
+#include "timeKeeping.h"
+#include "DebugPort.h"
+#include "AudioChip.h"
+
+//
+// Disable specific warnings
+//
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wreturn-type"
+
+
+
+// ----------------------------------------------------------------------------
+//
+// Standalone STM32F4 Simple Alarm Clock Stub Code
+//
+// This code just plays an MP3 file off of a connected USB flash drive.
+//
+// Trace support is enabled by adding the TRACE macro definition.
+// By default the trace messages are forwarded to the DEBUG output,
+// but can be rerouted to any device or completely suppressed, by
+// changing the definitions required in system/src/diag/trace_impl.c
+// (currently OS_USE_TRACE_ITM, OS_USE_TRACE_SEMIHOSTING_DEBUG/_STDOUT).
+
+
+void
+	Display7Segment( void ),
+	DisplaySegmentNumber( int ),
+//	ConvertTo24Hour( void ),
+	SetTime( void ),
+//	SetAlarm( void ),
+//	Snooze( void ),
+	ProcessButtons( void ),
+	GetCurrentTime( void ),
+	SystemClock_Config( void ),
+	MX_GPIO_Init( void ),
+	MX_I2C1_Init( void ),
+	MX_USB_HOST_Process( void );
+
+uint16_t
+	CheckButtons( void );
+
+
+// STMCube Example declarations.
+// static void USBH_UserProcess(USBH_HandleTypeDef *phost, uint8_t id);
+
+static void
+	MSC_Application(void);
+
+//static void
+	//Error_Handler(void);
+
+//
+// Global variables
+//
+
+RTC_InitTypeDef
+	ClockInit;				// Structure used to initialize the real time clock
+//
+RTC_TimeTypeDef
+	ClockTime;				// Structure to hold/store the current time
+
+RTC_DateTypeDef
+	ClockDate;				// Structure to hold the current date
+
+RTC_AlarmTypeDef
+	ClockAlarm;				// Structure to hold/store the current alarm time
+
+TIM_HandleTypeDef
+	Timer6_44Khz,			// Structure for the audio play back timer subsystem
+	DisplayTimer;			// Structure for the LED display timer subsystem
+
+DAC_HandleTypeDef
+	AudioDac;				// Structure for the audio digital to analog converter subsystem
+
+DMA_HandleTypeDef
+	AudioDma;				// Structure for the audio DMA direct memory access controller subsystem
+
+RTC_HandleTypeDef
+	RealTimeClock;			// Structure for the real time clock subsystem
+
+I2C_HandleTypeDef			// Structure for I2C subsystem. Used for external audio chip
+	I2c;
+
+volatile int
+	DisplayClockModeCount,	// Number of display ticks to show the current clock mode time format
+	PlayMusic = FALSE,		// Flag indicating if music should be played
+	DebounceCount = 0;		// Buttons debounce count
+
+volatile uint16_t
+	ButtonsPushed;			// Bit field containing the bits of which buttons have been pushed
+
+FATFS
+	UsbDiskFatFs;			// File system object for USB disk logical drive
+
+char
+	UsbDiskPath[4];			// USB Host logical drive path
+
+int
+	BcdTime[4],				// Array to hold the hours and minutes in BCD format
+	DisplayedDigit = 0,		// Current digit being displayed on the LED display
+
+							// Current format for the displayed time ( IE 12 or 24 hour format )
+	ClockHourFormat = CLOCK_HOUR_FORMAT_24,
+	AlarmPmFlag = 0,
+	TimePmFlag = 0;
+
+
+//
+// Functions required for long files names on fat32 partitions
+//
+
+WCHAR ff_convert (WCHAR wch, UINT dir)
+{
+	if (wch < 0x80)
+	{
+//
+// ASCII Char
+//
+		return wch;
+	}
+
+//
+// unicode not supported
+//
+	return 0;
+}
+
+WCHAR ff_wtoupper (WCHAR wch)
+{
+	if (wch < 0x80)
+	{
+//
+// ASCII Char
+//
+		if (wch >= 'a' && wch <= 'z')
+		{
+			wch &= ~0x20;
+		}
+
+		return wch;
+	}
+
+//
+// unicode not supported
+//
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+//
+// Dummy interrupt handler function
+//
+void TIM6_DAC_IRQHandler(void)
+{
+	HAL_NVIC_DisableIRQ( TIM6_DAC_IRQn );
+}
+
+
+
+/*
+ * Function: ConfigureAudioDma
+ *
+ * Description:
+ *
+ * Initialize DMA, DAC and timer 6 controllers for a mono channel audio to be played on PA4
+ *
+ */
+
+void ConfigureAudioDma( void )
+{
+
+	TIM_MasterConfigTypeDef
+		Timer6MasterConfigSync;
+
+	GPIO_InitTypeDef
+		GPIO_InitStructure;
+
+	DAC_ChannelConfTypeDef
+		DacConfig;
+
+//
+// If we have the timer 6 interrupt enabled then disable the timer from running when we halt the processor or hit a breakpoint.
+// This also applies to printing using the semihosting method which also uses breakpoints to transfer data to the host computer
+//
+
+
+	__HAL_DBGMCU_UNFREEZE_TIM5();
+
+//
+// Enable the clocks for GPIOA, GPIOC and Timer 6
+//
+	__HAL_RCC_TIM6_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+
+//
+// Configure PA4 as an analog output ( used for D/A output of the analog signal )
+//
+
+	GPIO_InitStructure.Pin = GPIO_PIN_4;
+	GPIO_InitStructure.Mode = GPIO_MODE_ANALOG;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;
+	GPIO_InitStructure.Alternate = 0;
+	HAL_GPIO_Init( GPIOA, &GPIO_InitStructure);
+
+
+
+
+//
+// Configure timer 6 for a clock frequency of 44Khz and a triggered output for the DAC
+//
+	Timer6_44Khz.Instance = TIM6;
+	Timer6_44Khz.Init.Prescaler = 20; //this value may have to be changed
+	Timer6_44Khz.Init.CounterMode = TIM_COUNTERMODE_UP;
+	Timer6_44Khz.Init.Period = 90; // this value may have to be changed
+	Timer6_44Khz.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	HAL_TIM_Base_Init( &Timer6_44Khz );
+
+	Timer6MasterConfigSync.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	Timer6MasterConfigSync.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	HAL_TIMEx_MasterConfigSynchronization( &Timer6_44Khz, &Timer6MasterConfigSync );
+
+//
+// Set the priority of the interrupt and enable it
+//
+	NVIC_SetPriority(TIM6_DAC_IRQn, 0);
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+
+//
+// Clear any pending interrupts
+//
+	__HAL_TIM_CLEAR_FLAG( &Timer6_44Khz, TIM_SR_UIF );
+
+
+
+//
+// Enable the timer interrupt and the DAC Trigger
+//
+
+	__HAL_TIM_ENABLE_DMA( &Timer6_44Khz, TIM_DIER_UDE );
+
+
+//
+// Enable the clocks for the DAC
+//
+	__HAL_RCC_DAC_CLK_ENABLE();
+
+	AudioDac.Instance = DAC;
+	if ( HAL_OK != HAL_DAC_Init( &AudioDac ))
+	{
+		trace_printf("DAC initialization failure\n");
+		return;
+	}
+
+//
+// Enable the trigger from the DMA controller and the output buffer of the DAC
+//
+	DacConfig.DAC_Trigger = DAC_TRIGGER_T6_TRGO;
+	DacConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+
+	if ( HAL_DAC_ConfigChannel(&AudioDac, &DacConfig, DAC_CHANNEL_1) != HAL_OK )
+	{
+		trace_printf("DAC configuration failure\n");
+		return;
+	}
+
+//
+// Enable the clock for the DMA controller
+//
+	__HAL_RCC_DMA1_CLK_ENABLE();
+
+//
+// Initialize the stream and channel number and the memory transfer settings
+//
+
+    AudioDma.Instance = DMA1_Stream5;
+    AudioDma.Init.Channel = DMA_CHANNEL_7;
+    AudioDma.Init.Direction = DMA_MEMORY_TO_PERIPH;
+    AudioDma.Init.PeriphInc = DMA_PINC_DISABLE;
+    AudioDma.Init.MemInc = DMA_MINC_ENABLE;
+    AudioDma.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    AudioDma.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    AudioDma.Init.Mode = DMA_NORMAL;
+    AudioDma.Init.Priority = DMA_PRIORITY_MEDIUM;
+    AudioDma.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    HAL_DMA_Init( &AudioDma );
+
+//
+// Link the DMA channel the to the DAC controller
+//
+    __HAL_LINKDMA( &AudioDac, DMA_Handle1, AudioDma );
+
+//
+// Enable the interrupt for the specific stream
+//
+    HAL_NVIC_SetPriority( DMA1_Stream5_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ( DMA1_Stream5_IRQn );
+
+//
+// Start the timer
+//
+	__HAL_TIM_ENABLE( &Timer6_44Khz );
+
+	return;
+}
+
+
+void ConfigureDisplay( void )
+{
+	GPIO_InitTypeDef
+	GPIO_InitStructure;
+
+	RCC_OscInitTypeDef
+	RCC_OscInitStruct;
+
+	RCC_PeriphCLKInitTypeDef
+	PeriphClkInitStruct;
+
+
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+	RCC_OscInitStruct.LSIState = RCC_LSI_ON;
+	if( HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK )
+		{
+			trace_printf( "HAL_RCC_OscConfig failed\r\n");
+			while( TRUE );
+		}
+
+
+	PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+	if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+		{
+			trace_printf( "HAL_RCCEx_PeriphCLKConfig failed\r\n");
+			while( TRUE );
+		}
+
+//  Enable clocks for PWR_CLK, RTC, GPIOE, GPIOD, GPIOC and TIM5.
+	__HAL_RCC_RTC_ENABLE();
+	__GPIOE_CLK_ENABLE();
+	__GPIOD_CLK_ENABLE();
+	__GPIOC_CLK_ENABLE();
+	__HAL_RCC_TIM5_CLK_ENABLE();
+
+
+// Enable the LED multiplexing display and push button timer (TIM5) at a frequency of 500Hz
+
+	DisplayTimer.Instance = TIM5; // Point to Timer 5
+	DisplayTimer.Init.Prescaler = 41999; // Timer clock maximum frequency is 84 MHz.
+	DisplayTimer.Init.CounterMode = TIM_COUNTERMODE_UP;
+	DisplayTimer.Init.Period = 3; //Timer will trigger at 500Hz
+	DisplayTimer.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	//DisplayTimer.Init.RepetitionCounter = 0;
+	HAL_TIM_Base_Init( &DisplayTimer );
+
+
+//// Configure the input pins 4, 5, 8, 9 and 11 of port C for reading the push buttons.
+
+	GPIO_InitStructure.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_11; // pin corresponding to push button
+	GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
+	GPIO_InitStructure.Alternate = 0;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure); // Initialize GPIO port C with above parameters
+
+
+	//// Configure GPIO for selecting each segment on a digit.
+	//	 Use free I/O pins of port E (pin 6 onwards).
+	GPIO_InitStructure.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11
+			| GPIO_PIN_12 | GPIO_PIN_13;
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	GPIO_InitStructure.Alternate = 0;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);
+	// Initialize GPIO port E with above parameters
+
+
+//// Configure GPIO for selecting each digit on the LED display.
+//	 Use pin 7 to 11 of port D.
+	GPIO_InitStructure.Pin = GPIO_PIN_4 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_12;
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStructure.Pull = GPIO_NOPULL;
+	GPIO_InitStructure.Alternate = 0;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
+	// Initialize GPIO port D with above parameters*/
+
+//// Enable the real time clock alarm A interrupt
+	RealTimeClock.Instance = RTC;
+	RealTimeClock.Init.HourFormat = RTC_HOURFORMAT_24;
+
+	RealTimeClock.Init.AsynchPrediv = 127;
+	RealTimeClock.Init.SynchPrediv = 0xFF;
+	RealTimeClock.Init.OutPut = RTC_OUTPUT_DISABLE;
+	RealTimeClock.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+	RealTimeClock.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+	HAL_RTC_Init(&RealTimeClock );
+
+	//__HAL_RTC_ALARM_ENABLE( &RealTimeClock, RTC_IT_ALRA);
+	__HAL_RTC_WRITEPROTECTION_DISABLE( &RealTimeClock );
+	__HAL_RTC_ALARMA_DISABLE( &RealTimeClock );
+	__HAL_RTC_ALARM_CLEAR_FLAG(&RealTimeClock, RTC_FLAG_ALRAF);
+
+//// Enable the timer interrupt
+	HAL_NVIC_SetPriority( TIM5_IRQn, 0, 0);//set priority for the interrupt. Value 0 corresponds to highest priority
+	HAL_NVIC_EnableIRQ( TIM5_IRQn );//Enable interrupt function request of Timer 5
+
+//// Enable the LED display and push button timer
+	__HAL_TIM_ENABLE_IT( &DisplayTimer, TIM_IT_UPDATE );// Enable timer interrupt flag to be set when timer count is reached
+	__HAL_TIM_ENABLE( &DisplayTimer );//Enable timer to start
+
+
+
+}
+
+
+int main(int argc, char* argv[])
+{
+
+//
+// Reset of all peripherals, Initializes the Flash interface and the System timer.
+//
+	HAL_Init();
+
+//
+// Configure the system clock
+//
+	SystemClock_Config();
+
+//
+// Initialize all configured peripherals
+//
+	MX_GPIO_Init();
+
+//
+// Enable the serial debug port. This allows for text messages to be sent via the STlink virtual communications port to the host computer.
+//
+	DebugPortInit();
+
+//
+// Display project name with version number
+//
+	trace_puts(
+			"*\n"
+			"*\n"
+			"* Alarm clock project for stm32f4discovery board V2.00\n"
+			"*\n"
+			"*\n"
+			);
+
+//
+// Initialize the I2C port for the external CODEC
+//
+	MX_I2C1_Init();
+
+//
+// Configure the CODEC for analog pass through mode.
+// This allows for audio to be played out of the stereo jack
+//
+	InitAudioChip();
+
+//
+// Initialize the flash file and the USB host adapter subsystem
+//
+
+	MX_FATFS_Init();
+	MX_USB_HOST_Init();
+
+//
+// Initialize the DMA and DAC systems. This allows for audio to be played out of GPIOA pin 4
+//
+	ConfigureAudioDma();
+
+//
+// Initialize the seven segment display pins
+//
+	ConfigureDisplay();
+
+	//Initialize real time clock
+	ClockTime.Hours = 12;
+	ClockTime.Minutes = 60;
+	ClockTime.Seconds = 00;
+	ClockTime.TimeFormat = RTC_HOURFORMAT_24;
+	ClockTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	ClockTime.StoreOperation = RTC_STOREOPERATION_RESET;
+
+ 	ClockDate.Date = 	21;
+	ClockDate.Month = 	RTC_MONTH_JUNE;
+	ClockDate.WeekDay = RTC_WEEKDAY_WEDNESDAY;
+	ClockDate.Year =	17;
+
+	HAL_RTC_SetDate(&RealTimeClock, &ClockDate, RTC_FORMAT_BIN);
+	HAL_RTC_SetTime(&RealTimeClock, &ClockTime, RTC_FORMAT_BIN);
+
+//
+// Send a greeting to the trace device (skipped on Release).
+//
+//	trace_puts("Initialization Complete");
+
+//
+// At this stage the system clock should have already been configured at high speed.
+//
+//	trace_printf("System clock: %u Hz\n", SystemCoreClock);
+
+//
+// Start the system timer
+//
+	timer_start();
+
+//	blink_led_init();
+
+//
+// Wait until the drive is mounted before we can play some music
+//
+	do {
+		MX_USB_HOST_Process();
+	} while ( Appli_state != APPLICATION_READY );
+
+	trace_printf( "\n" );
+
+//
+// Remove comment slashes from line line below for music to play at start
+//
+	//PlayMusic = TRUE;
+
+
+	//This runs constantly until an interrupt occurs
+	while ( TRUE )
+	{
+		//Debug RTC
+		/*if ( HAL_RTC_WaitForSynchro( &RealTimeClock ) == HAL_OK )
+		{
+			HAL_RTC_GetTime(&RealTimeClock, &ClockTime, RTC_FORMAT_BCD);
+			HAL_RTC_GetDate(&RealTimeClock, &ClockDate, RTC_FORMAT_BCD);
+
+			trace_printf("Time: %02d:%02d:%02d\n", ClockTime.Hours, ClockTime.Minutes, ClockTime.Seconds);
+		}*/
+//	checks for the alarm interrupt and call the music playing module
+		if ( TRUE == PlayMusic )
+		{
+
+    	 	 MSC_Application();
+		}
+
+//
+// Wait for an interrupt to occur
+//
+		__asm__ volatile ( "wfi" );
+
+
+	}
+}
+
+/** System Clock Configuration
+ */
+void SystemClock_Config(void)
+{
+
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct;
+
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLM = 4;
+	RCC_OscInitStruct.PLL.PLLN = 168;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+	RCC_OscInitStruct.PLL.PLLQ = 7;
+	HAL_RCC_OscConfig(&RCC_OscInitStruct);
+
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+			|RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
+	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5);
+
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_I2S;
+	PeriphClkInitStruct.PLLI2S.PLLI2SN = 192;
+	PeriphClkInitStruct.PLLI2S.PLLI2SR = 2;
+	HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct);
+
+	HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+
+	HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+
+	/* SysTick_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+/* I2C1 init function */
+void MX_I2C1_Init(void)
+{
+
+	I2c.Instance = I2C1;
+	I2c.Init.ClockSpeed = 100000;
+	I2c.Init.DutyCycle = I2C_DUTYCYCLE_2;
+	I2c.Init.OwnAddress1 = 0;
+	I2c.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	I2c.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	I2c.Init.OwnAddress2 = 0;
+	I2c.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	I2c.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+	HAL_I2C_Init( &I2c );
+
+}
+
+void MX_GPIO_Init(void)
+{
+
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOH_CLK_ENABLE();
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+
+
+
+	GPIO_InitStruct.Pin = GPIO_PIN_4;
+	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(CS_I2C_SPI_GPIO_Port, CS_I2C_SPI_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(OTG_FS_PowerSwitchOn_GPIO_Port, OTG_FS_PowerSwitchOn_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin Output Level */
+	HAL_GPIO_WritePin(GPIOD, LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin
+			|Audio_RST_Pin, GPIO_PIN_RESET);
+
+	/*Configure GPIO pin : CS_I2C_SPI_Pin */
+	GPIO_InitStruct.Pin = CS_I2C_SPI_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+
+	HAL_GPIO_Init(CS_I2C_SPI_GPIO_Port, &GPIO_InitStruct);
+	HAL_GPIO_Init( GPIOC, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : OTG_FS_PowerSwitchOn_Pin */
+	GPIO_InitStruct.Pin = OTG_FS_PowerSwitchOn_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(OTG_FS_PowerSwitchOn_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : PDM_OUT_Pin */
+	GPIO_InitStruct.Pin = PDM_OUT_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
+	HAL_GPIO_Init(PDM_OUT_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : B1_Pin */
+	GPIO_InitStruct.Pin = B1_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+
+
+	/*Configure GPIO pins : PA5 PA6 PA7 */
+	GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : BOOT1_Pin */
+	GPIO_InitStruct.Pin = BOOT1_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(BOOT1_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : CLK_IN_Pin */
+	GPIO_InitStruct.Pin = CLK_IN_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
+	HAL_GPIO_Init(CLK_IN_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pins : LD4_Pin LD3_Pin LD5_Pin LD6_Pin
+                           Audio_RST_Pin */
+	GPIO_InitStruct.Pin = LD4_Pin|LD3_Pin|LD5_Pin|LD6_Pin
+			|Audio_RST_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : OTG_FS_OverCurrent_Pin */
+	GPIO_InitStruct.Pin = OTG_FS_OverCurrent_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(OTG_FS_OverCurrent_GPIO_Port, &GPIO_InitStruct);
+
+	/*Configure GPIO pin : MEMS_INT2_Pin */
+	GPIO_InitStruct.Pin = MEMS_INT2_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_EVT_RISING;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(MEMS_INT2_GPIO_Port, &GPIO_InitStruct);
+
+}
+
+/**
+ * @brief  Main routine for Mass Storage Class
+ * @param  None
+ * @retval None
+ */
+static void MSC_Application(void)
+{
+	FRESULT
+		Result;                                          /* FatFs function common result code */
+
+//
+// Mount the flash drive using a fat file format
+//
+
+	Result = f_mount( &UsbDiskFatFs, (TCHAR const*)USBH_Path, 0);
+	if( FR_OK == Result )
+	{
+
+//
+// File system successfully mounted, play all the music files in the directory.
+//
+		while ( TRUE == PlayMusic )
+		{
+			PlayDirectory( "", 0 );
+		}
+	}
+	else
+	{
+//
+// FatFs Initialization Error
+//
+	//	Error_Handler();
+	}
+
+//
+// Unlink the USB disk I/O driver
+//
+	FATFS_UnLinkDriver( UsbDiskPath );
+}
+
+
+
+/*
+ * Function: TIM5_IRQHandler
+ *
+ * Description:
+ *
+ * Timer interrupt handler that is called at a rate of 500Hz. This function polls the time and
+ * displays it on the 7 segment display. It also checks for button presses and handles any bounce conditions.
+ *
+ */
+
+void TIM5_IRQHandler(void)
+{
+
+	__HAL_TIM_CLEAR_FLAG( &DisplayTimer, TIM_IT_UPDATE ); //clear flag status
+	//toggles pin for debug purposes
+	//HAL_GPIO_TogglePin( GPIOD, GPIO_PIN_12);
+	Display7Segment();
+}
+
+
+/*
+ * Function: RTC_Alarm_IRQHandler
+ *
+ * Description:
+ *
+ * When alarm occurs, clear all the interrupt bits and flags then start playing music.
+ *
+ */
+
+void RTC_Alarm_IRQHandler(void)
+{
+
+//
+// Verify that this is a real time clock interrupt
+//
+	if( __HAL_RTC_ALARM_GET_IT( &RealTimeClock, RTC_IT_ALRA ) != RESET )
+	{
+
+//
+// Clear the alarm flag and the external interrupt flag
+//
+    	__HAL_RTC_ALARM_CLEAR_FLAG( &RealTimeClock, RTC_FLAG_ALRAF );
+    	__HAL_RTC_EXTI_CLEAR_FLAG( RTC_EXTI_LINE_ALARM_EVENT );
+
+//
+// Restore the alarm to it's original time. This could have been a snooze alarm
+//
+    	HAL_RTC_SetAlarm_IT( &RealTimeClock, &ClockAlarm, RTC_FORMAT_BIN );
+
+    	PlayMusic = TRUE;
+
+	}
+
+
+}
+
+//sets digit to display on 7 seg
+void setDigit(void){
+
+	switch(DisplayedDigit){
+			case 0:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
+				DisplayedDigit = 1;
+				GetCurrentTime();
+				DisplaySegmentNumber(BcdTime[0]);
+				break;
+			case 1:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
+				DisplayedDigit = 2;
+				DisplaySegmentNumber(BcdTime[1]);
+				break;
+				//Digit 3 (case 2) is to light up the colons
+			case 2:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
+				DisplayedDigit = 3;
+				DisplaySegmentNumber(10);
+				break;
+			case 3:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_SET);
+				DisplayedDigit = 4;
+				DisplaySegmentNumber(BcdTime[2]);
+				break;
+			default:
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_RESET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
+				DisplaySegmentNumber(BcdTime[3]);
+				DisplayedDigit = 0;
+				break;
+			}
+}
+
+/*
+ * Function: Display7Segment
+ *
+ * Description:
+ *
+ * Displays the current time, alarm time or time format
+ *
+ */
+int blink = 0;
+int setAlarm = FALSE;
+void Display7Segment(void)
+{
+
+//
+// Clear the display
+//
+// Digits
+//
+	GPIOD->BSRR = ( GPIO_PIN_4 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_10 | GPIO_PIN_9 ) << 16;
+//
+// Segments
+///
+	GPIOE->BSRR = ( GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12 |
+			GPIO_PIN_13) << 16;
+
+
+// Select which digit to display the time for
+	if(setAlarm){
+		if(blink >= 100){
+			if(blink > 300){
+				blink =0;
+			}
+			setDigit();
+		}
+		else{
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
+		}
+		blink++;
+	}
+	else{
+		setDigit();
+	}
+}
+
+
+void DisplaySegmentNumber(int num)
+{
+	switch (num){
+			  case 1:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+				  break;
+			  case 2:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 3:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 4:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 5:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 6:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 7:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+				  break;
+			  case 8:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+			  case 9:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_SET);
+				  break;
+				  //Case 10 is for the colons between the numbers
+			  case 10:
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_RESET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_RESET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_RESET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_RESET);
+					HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+				  break;
+			  default:
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_7, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_10, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_12, GPIO_PIN_SET);
+				  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
+				  break;
+			  }
+}
+
+
+/*
+ * Function: SetTime
+ *
+ * Description:
+ *
+ * Advance either the time hours or minutes field. Validate the new time and then update the clock
+ *
+ */
+
+void SetTime(void)
+{
+	//Increment Hour
+	if(ButtonsPushed == 2){
+		ClockTime.Hours++;
+	}
+	//Increment Minutes
+	if(ButtonsPushed == 3){
+		ClockTime.Minutes++;
+	}
+}
+
+/*
+ * Function: SetAlarm
+ *
+ * Description:
+ *
+ * Advance either the alarm hours or minutes field. Validate the new alarm time and then set the alarm
+ *
+ */
+
+//void SetAlarm(void)
+//{
+//	}
+
+
+/*
+ * Function: Snooze
+ *
+ * Description:
+ *
+ * Add 10 Minutes to the current time and validate. Update the alarm and enable.
+ *
+ */
+
+//void Snooze(void)
+//{
+//}
+
+
+/*
+ * Function: GetCurrentTime
+ *
+ * Description:
+ *
+ * Return either the alarm time or current time in binary coded decimal format store in the array BcdTime.
+ *
+ */
+
+void GetCurrentTime(void)
+{
+	/*BcdTime[0] = 0;
+	BcdTime[1] = 1;
+	BcdTime[2] = 2;
+	BcdTime[3] = 3;*/
+
+	if ( HAL_RTC_WaitForSynchro( &RealTimeClock ) == HAL_OK )
+	{
+		//trace_printf("Time: %02d:%02d:%02d\n", ClockTime.Hours, ClockTime.Minutes, ClockTime.Seconds);
+		HAL_RTC_GetTime(&RealTimeClock, &ClockTime, RTC_FORMAT_BIN);
+		HAL_RTC_GetDate(&RealTimeClock, &ClockDate, RTC_FORMAT_BIN);
+		//Modulus of 10 outputs first digit, integer division by 10 gives second digit
+		BcdTime[2] = ClockTime.Minutes/10;
+		BcdTime[3] = ClockTime.Minutes%10;
+		BcdTime[0] = ClockTime.Hours/10;
+		BcdTime[1] = ClockTime.Hours%10;
+	}
+}
+
+/*
+
+
+ * Function: CheckButtons
+ *
+ * Description:
+ *
+ * Check the current state of all the buttons and apply debounce algorithm. Return TRUE with the ButtonPushed
+ * variable set indicating the button or buttons pushed if button press is detected.
+ *
+ */
+
+uint16_t CheckButtons( void )
+{
+	if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4)){ButtonsPushed = 1;}
+	if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5)){ButtonsPushed = 2;}
+	if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_8)){ButtonsPushed = 3;}
+	if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_9)){ButtonsPushed = 4;}
+	if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_11)){ButtonsPushed = 5;}
+	else{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
+/*
+ * Function: ProcessButtons
+ *
+ * Description:
+ *
+ * Test for which button or buttons have been pressed and do the appropriate operation.
+ *
+ *Button 1: Stop Alarm
+ *Button 2: Set hour
+ *Button 3: Set minute
+ *Button 4: Set Alarm
+ *Button 5: Snooze Alarm
+ *
+ *
+ */
+
+void ProcessButtons( void )
+{
+	switch(ButtonsPushed){
+	case 1:
+		PlayMusic = FALSE;
+		break;
+	case 2:
+	case 3:
+		SetTime();
+		break;
+	case 4:
+		break;
+	case 5:
+		break;
+	default:
+		break;
+	}
+}
+
+/*static void Error_Handler(void)
+{
+
+while(1)
+	{
+	}
+}*/
+
+
+
+
+#pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
