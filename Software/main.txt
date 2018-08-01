@@ -47,16 +47,16 @@
 void
 	Display7Segment( void ),
 	DisplaySegmentNumber( int ),
-//	ConvertTo24Hour( void ),
 	SetTime( void ),
 	SetAlarm( void ),
-//	Snooze( void ),
+	Snooze( void ),
 	ProcessButtons( void ),
 	GetCurrentTime( void ),
 	SystemClock_Config( void ),
 	MX_GPIO_Init( void ),
 	MX_I2C1_Init( void ),
-	MX_USB_HOST_Process( void );
+	MX_USB_HOST_Process( void ),
+	stopAlarm( void );
 
 uint16_t
 	CheckButtons( void );
@@ -427,14 +427,17 @@ void ConfigureDisplay( void )
 	RealTimeClock.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
 	HAL_RTC_Init(&RealTimeClock );
 
-	//__HAL_RTC_ALARM_ENABLE( &RealTimeClock, RTC_IT_ALRA);
+
 	__HAL_RTC_WRITEPROTECTION_DISABLE( &RealTimeClock );
 	__HAL_RTC_ALARMA_DISABLE( &RealTimeClock );
 	__HAL_RTC_ALARM_CLEAR_FLAG(&RealTimeClock, RTC_FLAG_ALRAF);
+	HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ( RTC_Alarm_IRQn );
 
 //// Enable the timer interrupt
 	HAL_NVIC_SetPriority( TIM5_IRQn, 0, 0);//set priority for the interrupt. Value 0 corresponds to highest priority
 	HAL_NVIC_EnableIRQ( TIM5_IRQn );//Enable interrupt function request of Timer 5
+
 
 //// Enable the LED display and push button timer
 	__HAL_TIM_ENABLE_IT( &DisplayTimer, TIM_IT_UPDATE );// Enable timer interrupt flag to be set when timer count is reached
@@ -523,6 +526,16 @@ int main(int argc, char* argv[])
 	HAL_RTC_SetDate(&RealTimeClock, &ClockDate, RTC_FORMAT_BIN);
 	HAL_RTC_SetTime(&RealTimeClock, &ClockTime, RTC_FORMAT_BIN);
 
+	ClockAlarm.AlarmTime.Seconds = 0;
+	ClockAlarm.AlarmTime.TimeFormat = RTC_HOURFORMAT_24;
+	ClockAlarm.AlarmTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
+	ClockAlarm.AlarmTime.StoreOperation = RTC_STOREOPERATION_RESET;
+	ClockAlarm.AlarmDateWeekDay = ClockDate.Date;
+	ClockAlarm.AlarmMask = RTC_ALARMMASK_DATEWEEKDAY;
+	ClockAlarm.Alarm = RTC_ALARM_A;
+
+	__HAL_RTC_ALARM_ENABLE_IT( &RealTimeClock, RTC_IT_ALRA);
+
 //
 // Send a greeting to the trace device (skipped on Release).
 //
@@ -552,7 +565,7 @@ int main(int argc, char* argv[])
 //
 // Remove comment slashes from line line below for music to play at start
 //
-	PlayMusic = TRUE;
+	//PlayMusic = TRUE;
 
 
 	//This runs constantly until an interrupt occurs
@@ -799,8 +812,6 @@ void TIM5_IRQHandler(void)
 {
 
 	__HAL_TIM_CLEAR_FLAG( &DisplayTimer, TIM_IT_UPDATE ); //clear flag status
-	//toggles pin for debug purposes
-	//HAL_GPIO_TogglePin( GPIOD, GPIO_PIN_12);
 	if(CheckButtons()){
 		ProcessButtons();
 	}
@@ -817,8 +828,8 @@ void TIM5_IRQHandler(void)
  *
  */
 int AlarmCounter = 0;
-int alarmMinutes = 0;
-int alarmHours = 0;
+int alarmMinutes = -1;
+int alarmHours = -1;
 void RTC_Alarm_IRQHandler(void)
 {
 
@@ -842,7 +853,6 @@ void RTC_Alarm_IRQHandler(void)
     	PlayMusic = TRUE;
 
 	}
-
 
 }
 
@@ -875,6 +885,7 @@ void setDigit(void){
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_7, GPIO_PIN_RESET);
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_8, GPIO_PIN_SET);
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_9, GPIO_PIN_RESET);
+
 				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_10, GPIO_PIN_RESET);
 				DisplayedDigit = 3;
 				DisplaySegmentNumber(10);
@@ -1119,17 +1130,23 @@ void SetTime(void)
 void SetAlarm(void)
 {
 	if(AlarmCounter == 0){
-		alarmMinutes = ClockTime.Minutes;
-		alarmHours =  ClockTime.Hours;
+		if(alarmMinutes == -1 && alarmHours == -1){
+			alarmMinutes = ClockTime.Minutes;
+			alarmHours =  ClockTime.Hours;
+		}
+		else{
+			alarmMinutes = ClockAlarm.AlarmTime.Minutes;
+			alarmHours = ClockAlarm.AlarmTime.Hours;
+		}
 		setAlarm = TRUE;
 		AlarmCounter++;
 	}
 	else{
-		__HAL_RTC_ALARMA_ENABLE( &RealTimeClock );
+		ClockAlarm.AlarmTime.Seconds = 0;
 		ClockAlarm.AlarmTime.Hours = alarmHours;
 		ClockAlarm.AlarmTime.Minutes = alarmMinutes;
-		HAL_RTC_SetAlarm_IT( &RealTimeClock, &ClockAlarm, RTC_FORMAT_BIN );
-		//setAlarm = FALSE;
+		HAL_RTC_SetAlarm_IT(&RealTimeClock, &ClockAlarm, RTC_FORMAT_BIN);
+		setAlarm = FALSE;
 		AlarmCounter = 0;
 	}
 }
@@ -1144,9 +1161,14 @@ void SetAlarm(void)
  *
  */
 
-//void Snooze(void)
-//{
-//}
+void Snooze(void)
+{
+	if(PlayMusic){
+		stopAlarm();
+		ClockAlarm.AlarmTime.Minutes += 10;
+		HAL_RTC_SetAlarm_IT(&RealTimeClock, &ClockAlarm, RTC_FORMAT_BIN);
+	}
+}
 
 
 /*
@@ -1215,7 +1237,11 @@ uint16_t CheckButtons( void )
 	}
 }
 
-
+void stopAlarm( void ){
+	PlayMusic = FALSE;
+	__HAL_RTC_ALARM_CLEAR_FLAG( &RealTimeClock, RTC_FLAG_ALRAF );
+	__HAL_RTC_EXTI_CLEAR_FLAG( RTC_EXTI_LINE_ALARM_EVENT );
+}
 /*
  * Function: ProcessButtons
  *
@@ -1232,12 +1258,14 @@ uint16_t CheckButtons( void )
  *
  */
 
+
 void ProcessButtons( void )
 {
 
 	switch(ButtonsPushed){
 	case 1:
-		PlayMusic = FALSE;
+		//Stop music, reset alarm so it cannot go off repeatedly for the entire minute
+		stopAlarm();
 		break;
 	case 2:
 	case 3:
@@ -1247,6 +1275,7 @@ void ProcessButtons( void )
 		SetAlarm();
 		break;
 	case 5:
+		Snooze();
 		break;
 	default:
 		break;
