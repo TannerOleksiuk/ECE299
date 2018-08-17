@@ -1,4 +1,4 @@
-update=7/3/2018 9:26:28 PM
+update=8/16/2018 11:12:36 PM
 version=1
 last_client=kicad
 [pcbnew]
@@ -62,6 +62,8 @@ LibName32=atmel
 LibName33=contrib
 LibName34=valves
 LibName35=C:/Users/lucas/Desktop/ECE.299 parts/ECE
+[general]
+version=1
 [schematic_editor]
 version=1
 PageLayoutDescrFile=
@@ -72,5 +74,3 @@ NetFmtName=Pcbnew
 SpiceForceRefPrefix=0
 SpiceUseNetNumbers=0
 LabSize=60
-[general]
-version=1
